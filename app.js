@@ -268,6 +268,82 @@ function getWeatherConfig(code, isDay) {
     return config;
 }
 
+// Clothing Database & Rules
+const clothingDatabase = [
+    {
+        name: 'מעיל גשם',
+        img: 'assets/raincoat.jpg',
+        desc: 'מעיל גשם חם ונוגד מים - מומלץ ליום גשום וקריר!',
+        check: (temp, code) => isRainy(code) && temp < 15
+    },
+    {
+        name: 'מטרייה',
+        img: 'assets/umbrella.jpg',
+        desc: 'מטרייה - אל תשכח לקחת כדי להישאר יבש בגשם!',
+        check: (temp, code) => isRainy(code)
+    },
+    {
+        name: 'סוודר חם',
+        img: 'assets/sweater.jpg',
+        desc: 'סוודר חם - מושלם למזג אוויר קריר ויבש.',
+        check: (temp, code) => temp < 15 && !isRainy(code)
+    },
+    {
+        name: 'משקפי שמש',
+        img: 'assets/sunglasses.jpg',
+        desc: 'משקפי שמש - השמש חזקה בחוץ, שמור על העיניים!',
+        check: (temp, code) => temp > 25 && isSunny(code)
+    },
+    {
+        name: 'חולצה קצרה',
+        img: 'assets/tshirt.jpg',
+        desc: 'חולצה קצרה ובגדים קלים - חם ונעים בחוץ!',
+        check: (temp, code) => temp >= 18 && !isRainy(code)
+    },
+    {
+        name: 'כובע צמר',
+        img: 'assets/beanie.jpg',
+        desc: 'כובע צמר - לשמירה על חום הגוף בימים קרים במיוחד.',
+        check: (temp, code) => temp < 10
+    }
+];
+
+function isRainy(code) {
+    // Open-Meteo rain, drizzle, showers, or thunderstorm codes
+    return [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(code);
+}
+
+function isSunny(code) {
+    // Clear sky, mainly clear, partly cloudy
+    return [0, 1, 2].includes(code);
+}
+
+function renderClothingRecommendations(temp, code) {
+    const container = document.getElementById('clothingContainer');
+    const section = document.getElementById('clothingSection');
+    container.innerHTML = '';
+    
+    // Filter matching clothing items
+    const matches = clothingDatabase.filter(item => item.check(temp, code));
+    
+    if (matches.length > 0) {
+        section.classList.remove('hidden');
+        matches.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'clothing-card';
+            card.innerHTML = `
+                <div class="clothing-img-wrapper">
+                    <img src="${item.img}" alt="${item.name}">
+                </div>
+                <div class="clothing-tooltip">${item.desc}</div>
+            `;
+            container.appendChild(card);
+        });
+    } else {
+        section.classList.add('hidden');
+    }
+}
+
 // Render Weather Data
 function renderWeather(data) {
     const current = data.current;
@@ -300,6 +376,9 @@ function renderWeather(data) {
     windSpeedEl.textContent = `${Math.round(current.wind_speed_10m)} קמ"ש`;
     uvIndexEl.textContent = daily.uv_index_max[0] ? Math.round(daily.uv_index_max[0]) : '--';
     
+    // Render Clothing Recommendations for current temp & code
+    renderClothingRecommendations(Math.round(current.temperature_2m), current.weather_code);
+
     // 3. Render Today's Hourly Forecast (next 12 hours starting from current hour)
     renderHourly(hourly);
 
