@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חיזוי מזג אוויר 🌦️</title>
+    <!-- Google Fonts - Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome or Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container bg-default" id="appContainer">
+        <!-- Overlay for atmospheric depth -->
+        <div class="overlay"></div>
+
+        <main class="content-wrapper">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-icon">
+                    <i data-lucide="cloud-sun" class="main-icon"></i>
+                </div>
+                <h1>תחזית מזג אוויר</h1>
+                <p class="subtitle">הזן מיקום וקבל תחזית מפורטת להיום ולמחר</p>
+            </header>
+
+            <!-- Search Area -->
+            <section class="search-section">
+                <div class="search-box">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="חפש עיר בעולם (לדוגמה: Tel Aviv, London)..." autocomplete="off">
+                    <button id="clearBtn" class="clear-btn hidden">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <!-- Autocomplete Dropdown -->
+                <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+            </section>
+
+            <!-- Error State -->
+            <section id="errorMessage" class="error-message hidden">
+                <i data-lucide="alert-circle" class="error-icon"></i>
+                <span id="errorText">לא נמצאו תוצאות למיקום המבוקש.</span>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loadingState" class="loading-state hidden">
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-temp"></div>
+                    <div class="skeleton skeleton-details"></div>
+                </div>
+            </section>
+
+            <!-- Weather Details Section -->
+            <section id="weatherContent" class="weather-content hidden">
+                <!-- Today's Weather Card -->
+                <div class="weather-card current-card animate-fade-in">
+                    <div class="card-header">
+                        <span class="badge">היום</span>
+                        <h2 id="cityName" class="city-name">--</h2>
+                        <p id="currentDate" class="current-date">--</p>
+                    </div>
+
+                    <div class="card-body-main">
+                        <div class="temp-display">
+                            <span id="currentTemp" class="temp-value">--</span>
+                            <span class="temp-unit">°C</span>
+                        </div>
+                        <div class="weather-status">
+                            <div id="weatherIconContainer" class="status-icon-wrapper">
+                                <!-- Dynamic Icon Loaded Here -->
+                            </div>
+                            <span id="weatherDesc" class="status-text">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <i data-lucide="thermometer"></i>
+                            <div class="detail-info">
+                                <span class="label">מרגיש כמו</span>
+                                <span id="apparentTemp" class="value">--°C</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i data-lucide="droplets"></i>
+                            <div class="detail-info">
+                                <span class="label">לחות יחסית</span>
+                                <span id="humidity" class="value">--%</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i data-lucide="wind"></i>
+                            <div class="detail-info">
+                                <span class="label">רוח</span>
+                                <span id="windSpeed" class="value">-- קמ"ש</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i data-lucide="sun"></i>
+                            <div class="detail-info">
+                                <span class="label">מדד UV מקסימלי</span>
+                                <span id="uvIndex" class="value">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hourly Forecast -->
+                    <div class="hourly-section">
+                        <h3>תחזית שעתית להיום</h3>
+                        <div id="hourlyContainer" class="hourly-container scroll-x">
+                            <!-- Hourly bubbles dynamically generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tomorrow's Weather Card -->
+                <div class="weather-card tomorrow-card animate-fade-in">
+                    <div class="card-header">
+                        <span class="badge badge-tomorrow">מחר</span>
+                        <h2 class="tomorrow-title">התחזית למחר</h2>
+                        <p id="tomorrowDate" class="tomorrow-date">--</p>
+                    </div>
+
+                    <div class="card-body-main">
+                        <div class="temp-range">
+                            <div class="temp-range-item">
+                                <span class="range-label">מקסימום</span>
+                                <span id="tomorrowTempMax" class="range-value max">--°C</span>
+                            </div>
+                            <div class="temp-divider"></div>
+                            <div class="temp-range-item">
+                                <span class="range-label">מינימום</span>
+                                <span id="tomorrowTempMin" class="range-value min">--°C</span>
+                            </div>
+                        </div>
+                        <div class="weather-status">
+                            <div id="tomorrowIconContainer" class="status-icon-wrapper">
+                                <!-- Dynamic Icon -->
+                            </div>
+                            <span id="tomorrowDesc" class="status-text">--</span>
+                        </div>
+                    </div>
+
+                    <div class="details-grid tomorrow-details">
+                        <div class="detail-item">
+                            <i data-lucide="wind"></i>
+                            <div class="detail-info">
+                                <span class="label">רוח מקסימלית</span>
+                                <span id="tomorrowWind" class="value">-- קמ"ש</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i data-lucide="cloud-rain"></i>
+                            <div class="detail-info">
+                                <span class="label">קוד מזג אוויר</span>
+                                <span id="tomorrowCode" class="value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
