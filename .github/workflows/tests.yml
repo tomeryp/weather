@@ -1,0 +1,25 @@
+name: Tests
+
+# הרצת הבדיקות בכל דחיפה (push) ובכל בקשת מיזוג (pull request)
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # מוריד את הקוד של המאגר אל שרת ה-CI
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # מתקין Node.js (גרסה 22)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # מריץ את הבדיקות (npm test => node --test)
+      - name: Run tests
+        run: npm test
