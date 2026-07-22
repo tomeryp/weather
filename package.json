@@ -1,0 +1,8 @@
+{
+  "name": "weather-forecast-app",
+  "version": "1.0.0",
+  "description": "אפליקציית תחזית מזג אוויר",
+  "scripts": {
+    "test": "node --test"
+  }
+}
